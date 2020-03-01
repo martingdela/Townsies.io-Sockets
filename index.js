@@ -33,7 +33,7 @@ getRoomToConnect = async () => {
 
     // If rooms exist, check if one is open
     for (const [i, room] of rooms.entries()) {
-        if(room.open) { return i }
+        if (room.open) { return i }
     }
 
     //If none is, create a new one
@@ -50,7 +50,7 @@ createNewRoom = (name) => {
 
 io.on('connection', async socket => {
     let roomIndex = await getRoomToConnect()
-    await onRoomConnection(socket,roomIndex)
+    await onRoomConnection(socket, roomIndex)
     await onPlayerCreation(socket.id, roomIndex)
 
     socket.on('disconnect', async () => {
@@ -58,7 +58,7 @@ io.on('connection', async socket => {
     })
 
     socket.on('chat-message', (msg) => {
-        if(msg.substring(0,1) == '/') { return onCommandInput(msg,socket) } 
+        if (msg.substring(0, 1) == '/') { return onCommandInput(msg, socket) }
         socket.to(rooms[players[socket.id].roomIdx].name).emit('message', msg)
     })
 })
@@ -85,43 +85,50 @@ uuidv4 = () => {
     });
 }
 
-onCommandInput = (msg,socket) => {
+onCommandInput = (msg, socket) => {
     //Remove the first slash
-    msg = msg.substring(1,msg.length)
+    msg = msg.substring(1, msg.length)
     msg = msg.split(' ')
-    if(msg.length < 2) { return console.log(`Expected args (2) got ${msg.length}. Won't parse`)}
-    switch(msg[0]) {
-        case 'switch':
-            console.log(`player is in room: ${players[socket.id].roomIdx}`)
-            let idx = -1
-            for (const [i, room] of rooms.entries()) {
-                if(room.name == msg[1]) { 
-                    idx = i
-                }
-            }
-            
-            if(idx < 0) { idx = createNewRoom(msg[1]) }
-            if(!rooms[idx].open) { return console.log('Room is at capacity')}
-
-            socket.leave(rooms[players[socket.id].roomIdx].name, () => {
-                onRoomLeaving(socket)
-                onRoomConnection(socket,idx)
-                players[socket.id].roomIdx = idx
-            })
+    if (msg.length < 2) { return console.log(`Expected args (2) got ${msg.length}. Won't parse`) }
+    switch (msg[0]) {
+        case 'change':
+            onRoomChange(socket,msg)
             break
         case 'nickname':
-            players[socket.id].name = msg.slice(1).join(" ")
+            onNicknameChange(socket,msg)
             break
         default:
             console.log('this command doesnt exist')
     }
 }
 
+onRoomChange = async (socket, msg) => {
+    let idx = -1
+    for (const [i, room] of rooms.entries()) {
+        if (room.name == msg[1]) {
+            idx = i
+        }
+    }
 
-onRoomConnection = async (socket,index) => {
+    if (idx < 0) { idx = createNewRoom(msg[1]) }
+    if (!rooms[idx].open) { return console.log('Room is at capacity') }
+
+    socket.leave(rooms[players[socket.id].roomIdx].name, () => {
+        onRoomLeaving(socket)
+        onRoomConnection(socket, idx)
+        players[socket.id].roomIdx = idx
+    })
+}
+
+onNicknameChange = async (socket, msg) => {
+    players[socket.id].name = msg.slice(1).join(" ")
+}
+
+
+onRoomConnection = async (socket, index) => {
     socket.join(rooms[index].name, () => {
         rooms[index].count += 1
-        if(rooms[index].count >= MAX_PLAYERS_PER_ROOM) { rooms[index].open = false }
+        if (rooms[index].count >= MAX_PLAYERS_PER_ROOM) { rooms[index].open = false }
         console.log(`${rooms[index].count} Townsies in ${rooms[index].name}`)
     })
 }
