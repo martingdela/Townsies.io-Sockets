@@ -1,0 +1,30 @@
+{
+  "name": "townsies.io-sockets",
+  "version": "0.0.1",
+  "description": "Web Sockets logic and simple HTML Tester",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a01334390/Townsies.io-Sockets.git"
+  },
+  "keywords": [
+    "townsies",
+    "web",
+    "nodejs"
+  ],
+  "author": "@A01334390",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/a01334390/Townsies.io-Sockets/issues"
+  },
+  "homepage": "https://github.com/a01334390/Townsies.io-Sockets#readme",
+  "dependencies": {
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}
