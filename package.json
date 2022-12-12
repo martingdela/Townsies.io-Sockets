@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/a01334390/Townsies.io-Sockets#readme",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "socket.io": "^2.3.0"
   },
   "devDependencies": {
